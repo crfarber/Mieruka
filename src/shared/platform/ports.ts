@@ -8,6 +8,19 @@ export type Clock = { now(): number };
 
 export const systemClock: Clock = { now: () => Date.now() };
 
+/**
+ * The time zone of the device: the minutes to add to UTC at a given moment (+120 in Amsterdam in
+ * summer). A port, so a rule about "today" gives the same answer in every test run.
+ */
+export type TimeZone = { offsetMinutes(epochMs: number): number };
+
+export const systemTimeZone: TimeZone = {
+  offsetMinutes: (epochMs) => -new Date(epochMs).getTimezoneOffset() || 0,
+};
+
+/** Cryptographically secure random bytes, for generating keys. */
+export type RandomBytes = (length: number) => Uint8Array;
+
 export type Sleep = (ms: number) => Promise<void>;
 
 export const realSleep: Sleep = (ms) =>

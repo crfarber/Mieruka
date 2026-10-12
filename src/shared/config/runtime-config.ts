@@ -7,6 +7,10 @@ export type Environment = (typeof ENVIRONMENTS)[number];
 export const AUTH_PROVIDERS = ['demo', 'azure-ad'] as const;
 export type AuthProviderName = (typeof AUTH_PROVIDERS)[number];
 
+/** bunq's real API or its sandbox, where test users come with play money (docs/decisions/0018). */
+export const BUNQ_ENVIRONMENTS = ['production', 'sandbox'] as const;
+export type BunqEnvironment = (typeof BUNQ_ENVIRONMENTS)[number];
+
 export type AzureAdConfig = {
   tenantId: string;
   clientId: string;
@@ -23,6 +27,7 @@ export type RuntimeConfig = {
   apiBaseUrl: string | null;
   environment: Environment;
   auth: AuthConfig;
+  bunqEnvironment: BunqEnvironment;
 };
 
 /** Names of the variables the app reads. Expo inlines EXPO_PUBLIC_* at build time. */
@@ -34,7 +39,8 @@ export type RawEnv = Partial<
     | 'EXPO_PUBLIC_AZURE_AD_TENANT_ID'
     | 'EXPO_PUBLIC_AZURE_AD_CLIENT_ID'
     | 'EXPO_PUBLIC_AZURE_AD_REDIRECT_URL'
-    | 'EXPO_PUBLIC_AZURE_AD_SCOPES',
+    | 'EXPO_PUBLIC_AZURE_AD_SCOPES'
+    | 'EXPO_PUBLIC_BUNQ_ENVIRONMENT',
     string | undefined
   >
 >;
@@ -52,6 +58,7 @@ const envSchema = z.object({
   EXPO_PUBLIC_AZURE_AD_CLIENT_ID: optionalString,
   EXPO_PUBLIC_AZURE_AD_REDIRECT_URL: optionalString,
   EXPO_PUBLIC_AZURE_AD_SCOPES: optionalString,
+  EXPO_PUBLIC_BUNQ_ENVIRONMENT: z.enum(BUNQ_ENVIRONMENTS).default('production'),
 });
 
 /** `.env` files produce empty strings for unset variables; treat them as missing. */
@@ -77,6 +84,7 @@ export function parseRuntimeConfig(env: RawEnv): Result<RuntimeConfig, string[]>
   const base = {
     apiBaseUrl: data.EXPO_PUBLIC_API_BASE_URL ?? null,
     environment: data.EXPO_PUBLIC_ENVIRONMENT,
+    bunqEnvironment: data.EXPO_PUBLIC_BUNQ_ENVIRONMENT,
   };
 
   if (data.EXPO_PUBLIC_AUTH_PROVIDER === 'demo') {

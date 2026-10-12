@@ -15,6 +15,8 @@ export function readRuntimeConfig(): RuntimeConfig {
     EXPO_PUBLIC_AZURE_AD_CLIENT_ID: process.env.EXPO_PUBLIC_AZURE_AD_CLIENT_ID,
     EXPO_PUBLIC_AZURE_AD_REDIRECT_URL: process.env.EXPO_PUBLIC_AZURE_AD_REDIRECT_URL,
     EXPO_PUBLIC_AZURE_AD_SCOPES: process.env.EXPO_PUBLIC_AZURE_AD_SCOPES,
+    // Optional. `sandbox` talks to bunq's test environment instead of real accounts.
+    EXPO_PUBLIC_BUNQ_ENVIRONMENT: process.env.EXPO_PUBLIC_BUNQ_ENVIRONMENT,
   });
 
   if (!result.ok) {

@@ -16,8 +16,25 @@ import {
   type SessionStore,
   type TokenProvider,
 } from '@/domeinen/auth';
+import { calendarDateAt, type CalendarDate } from '@/domeinen/budget';
+import {
+  bindBunqStore,
+  BUNQ_API_URLS,
+  BUNQ_QUERY_KEY,
+  createAccountChoice,
+  createAccountsReader,
+  createBunqConnection,
+  createBunqStore,
+  createConnectionRepository,
+  type AccountChoice,
+  type AccountsReader,
+  type BunqConnectionService,
+  type BunqStore,
+  type RequestSigner,
+} from '@/domeinen/bunq';
 import { createLanguageSettings, type LanguageSettings } from '@/domeinen/settings';
 import { supportLogText, type LogShare, type SupportLog } from '@/domeinen/support';
+import { AuthExpiredError } from '@/shared/api/errors';
 import { createHttpClient, type HttpClient } from '@/shared/api/http-client';
 import type { RuntimeConfig } from '@/shared/config/runtime-config';
 import { createI18n } from '@/shared/i18n/i18n';
@@ -29,11 +46,13 @@ import {
   noopHaptics,
   realSleep,
   systemClock,
+  systemTimeZone,
   type Clock,
   type Haptics,
   type KeyValueStore,
   type SecretStore,
   type Sleep,
+  type TimeZone,
 } from '@/shared/platform/ports';
 import { createQueryClient } from '@/shared/query/create-query-client';
 import { clearQueryCache, loadQueryCache, saveQueryCache } from '@/shared/query/query-cache-store';
@@ -54,8 +73,11 @@ export type ContainerInput = {
   deviceAuthenticator: Authenticator | null;
   /** System share sheet for the redacted support log. */
   logShare: LogShare;
+  /** Key pair and signatures for bunq (docs/decisions/0018). */
+  bunqSigner: RequestSigner;
   fetch?: typeof fetch;
   clock?: Clock;
+  timeZone?: TimeZone;
   sleep?: Sleep;
   scheduler?: Scheduler;
   /** Short vibration on toast tones. Defaults to a noop. */
@@ -82,6 +104,14 @@ export type Container = {
   /** Shared timer port — used by toasts and the status overlay. */
   scheduler: Scheduler;
   languageSettings: LanguageSettings;
+  bunq: {
+    connection: BunqConnectionService;
+    accounts: AccountsReader;
+    accountChoice: AccountChoice;
+    store: BunqStore;
+  };
+  /** Today's date in the time zone of the phone. */
+  today(): CalendarDate;
   /**
    * Storage, session UI state and query cache for the __DEV__ debug screen.
    * Does not expose SecretStore on the container — only this snapshot.
@@ -131,6 +161,7 @@ function unconfiguredHttpClient(): HttpClient {
 export function createContainer(input: ContainerInput): Container {
   const { config } = input;
   const clock = input.clock ?? systemClock;
+  const timeZone = input.timeZone ?? systemTimeZone;
   const sleep = input.sleep ?? realSleep;
   const scheduler = input.scheduler ?? timerScheduler;
   const haptics = input.haptics ?? noopHaptics;
@@ -190,6 +221,40 @@ export function createContainer(input: ContainerInput): Container {
   const sessionStore = createSessionStore();
   const unbindSessionStore = bindSessionStore(tokenProvider, sessionStore);
 
+  // bunq authenticates with its own headers (every bunq call sets `auth: false`), so the token of
+  // the app's own sign-in never goes there.
+  const bunqHttp = createHttpClient({
+    baseUrl: BUNQ_API_URLS[config.bunqEnvironment],
+    fetch: fetchImpl,
+    getAccessToken: async () => null,
+    refreshAccessToken: () => Promise.reject(new AuthExpiredError('no-session')),
+    logger,
+  });
+  const bunqStore = createBunqStore();
+  const bunqConnection = createBunqConnection({
+    http: bunqHttp,
+    signer: input.bunqSigner,
+    repository: createConnectionRepository(input.secretStore),
+    logger,
+  });
+  const unbindBunqStore = bindBunqStore(bunqConnection, bunqStore);
+  const accountChoice = createAccountChoice({
+    store: input.keyValueStore,
+    apply: (accountId) => bunqStore.setState({ selectedAccountId: accountId }),
+    logger,
+  });
+  const bunqAccounts = createAccountsReader({ connection: bunqConnection, http: bunqHttp, logger });
+
+  // When the connection ends (the user disconnects, or bunq refuses the key), its data goes too.
+  const unsubscribeBunqEvents = bunqConnection.subscribe((event) => {
+    if (event.type === 'disconnected') {
+      queryClient.removeQueries({ queryKey: BUNQ_QUERY_KEY });
+      accountChoice.forget().catch((error: unknown) => {
+        logger.warn('bunq', 'Could not forget the chosen account', { error });
+      });
+    }
+  });
+
   const supportLog: SupportLog = {
     text: () => supportLogText(logger.entries(), clock.now()),
     share: () => input.logShare.share(supportLogText(logger.entries(), clock.now())),
@@ -200,6 +265,9 @@ export function createContainer(input: ContainerInput): Container {
     cancelPendingCacheSave();
     queryClient.clear();
     await clearQueryCache(input.keyValueStore);
+    // The bunq connection and the chosen account belong to the user who signed out.
+    await bunqConnection.disconnect();
+    await accountChoice.forget();
   }
 
   const authService = createAuthService({
@@ -248,6 +316,17 @@ export function createContainer(input: ContainerInput): Container {
     statusOverlay,
     scheduler,
     languageSettings,
+    bunq: {
+      connection: bunqConnection,
+      accounts: bunqAccounts,
+      accountChoice,
+      store: bunqStore,
+    },
+
+    today() {
+      const now = clock.now();
+      return calendarDateAt(now, timeZone.offsetMinutes(now));
+    },
 
     loadDebugSnapshot: () =>
       collectDebugSnapshot({
@@ -261,6 +340,7 @@ export function createContainer(input: ContainerInput): Container {
     async start() {
       // Before the session is known, so the first screen after the splash is already right.
       await languageSettings.restore();
+      await accountChoice.restore();
       lifecycle.start();
       try {
         await tokenProvider.restore();
@@ -273,6 +353,13 @@ export function createContainer(input: ContainerInput): Container {
           signedOutReason: null,
         });
       }
+      try {
+        await bunqConnection.restore();
+      } catch (error) {
+        // Secure storage could not be read. Offer to connect instead of waiting forever.
+        logger.error('bunq', 'Could not restore the bunq connection', { error });
+        bunqStore.setState({ status: 'disconnected', disconnectedReason: null });
+      }
       if (tokenProvider.getStatus() === 'signed-in') {
         await loadQueryCache(queryClient, input.keyValueStore);
       }
@@ -283,6 +370,8 @@ export function createContainer(input: ContainerInput): Container {
       cancelPendingCacheSave();
       unbindSessionStore();
       unsubscribeSessionEvents();
+      unbindBunqStore();
+      unsubscribeBunqEvents();
       unsubscribeQueryCache();
     },
   };

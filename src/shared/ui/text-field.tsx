@@ -25,6 +25,7 @@ type TextFieldProps = Pick<
   | 'onFocus'
   | 'onBlur'
   | 'autoCapitalize'
+  | 'secureTextEntry'
 > & {
   label?: string;
   error?: string | null;

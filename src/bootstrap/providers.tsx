@@ -4,6 +4,8 @@ import { I18nextProvider } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { AppState } from 'react-native';
 import { AuthProvider } from '@/domeinen/auth/ui';
+import { BudgetProvider } from '@/domeinen/budget/ui';
+import { BunqProvider } from '@/domeinen/bunq/ui';
 import { SettingsProvider } from '@/domeinen/settings/ui';
 import { SupportProvider } from '@/domeinen/support/ui';
 import { StatusOverlayProvider } from '@/shared/ui/status-overlay-host';
@@ -51,6 +53,7 @@ export function AppProviders({
     [container],
   );
   const settings = useMemo(() => ({ languageSettings: container.languageSettings }), [container]);
+  const budget = useMemo(() => ({ today: () => container.today() }), [container]);
 
   return (
     <QueryClientProvider client={container.queryClient}>
@@ -61,7 +64,11 @@ export function AppProviders({
               <AuthProvider value={auth}>
                 <DevToolsProvider value={devTools}>
                   <SettingsProvider value={settings}>
-                    <SupportProvider value={container.supportLog}>{children}</SupportProvider>
+                    <SupportProvider value={container.supportLog}>
+                      <BunqProvider value={container.bunq}>
+                        <BudgetProvider value={budget}>{children}</BudgetProvider>
+                      </BunqProvider>
+                    </SupportProvider>
                   </SettingsProvider>
                 </DevToolsProvider>
               </AuthProvider>

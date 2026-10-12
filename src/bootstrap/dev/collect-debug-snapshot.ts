@@ -6,11 +6,15 @@ import {
   type SessionStatus,
   type TokenProvider,
 } from '@/domeinen/auth';
+import { ACCOUNT_CHOICE_KEY } from '@/domeinen/bunq';
 import { LANGUAGE_KEY } from '@/domeinen/settings';
 import type { KeyValueStore, SecretStore } from '@/shared/platform/ports';
 
-/** Keys that persist something. expo-secure-store has no getAllKeys, so the list is explicit. */
-const STORAGE_KEYS = [SESSION_KEY, LANGUAGE_KEY] as const;
+/**
+ * Keys that persist something. expo-secure-store has no getAllKeys, so the list is explicit. The
+ * bunq connection is left out on purpose: its API key gives access to a bank account.
+ */
+const STORAGE_KEYS = [SESSION_KEY, LANGUAGE_KEY, ACCOUNT_CHOICE_KEY] as const;
 
 /** Cap query `data` so a large list does not freeze the debug screen. */
 const MAX_QUERY_DATA_CHARS = 8_000;

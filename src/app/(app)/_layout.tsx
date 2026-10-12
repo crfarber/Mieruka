@@ -14,8 +14,10 @@ export default function AppLayout() {
       <Stack screenOptions={defaultStackHeaderOptions}>
         <Stack.Screen
           name="index"
-          options={{ title: t('home.title'), headerRight: () => <SettingsHeaderButton /> }}
+          options={{ title: t('budget.title'), headerRight: () => <SettingsHeaderButton /> }}
         />
+        <Stack.Screen name="bunq-connect" options={{ title: t('bunq.connect.title') }} />
+        <Stack.Screen name="bunq-accounts" options={{ title: t('bunq.accounts.title') }} />
         <Stack.Screen name="settings" options={{ title: t('settings.title') }} />
         <Stack.Screen name="language" options={{ title: t('settings.language.title') }} />
         <Stack.Screen name="support" options={{ title: t('support.title') }} />

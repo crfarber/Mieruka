@@ -38,9 +38,56 @@ export const nl = {
       failed: 'Het lukte niet. Probeer het opnieuw.',
     },
   },
-  home: {
-    title: 'Home',
-    body: 'Je bent ingelogd. Bouw vanaf hier je eerste domein, zie docs/conventions.md.',
+  budget: {
+    title: 'Per dag',
+    perDay: 'Vandaag te besteden',
+    daysLeft: 'Nog {{count}} dagen deze maand, vandaag meegeteld.',
+    lastDay: 'Vandaag is de laatste dag van de maand.',
+    nothingLeft: 'Er staat niets meer op deze rekening om te verdelen.',
+    balance: 'Saldo {{amount}} op {{account}}',
+    loadFailed: 'Het saldo kon niet worden opgehaald.',
+    connect: {
+      title: 'Koppel je bunq-rekening',
+      body: 'De app leest het saldo van één bunq-rekening en rekent uit hoeveel je per dag kunt uitgeven tot het eind van de maand.',
+      refused:
+        'bunq accepteert de koppeling niet meer. Koppel opnieuw met een geldige API-sleutel.',
+      action: 'bunq koppelen',
+    },
+    choose: {
+      body: 'Kies de rekening waarmee je wilt rekenen.',
+      missing: 'De gekozen rekening is er niet meer. Kies een andere.',
+      action: 'Andere rekening kiezen',
+    },
+  },
+  bunq: {
+    connect: {
+      title: 'bunq koppelen',
+      intro: 'Koppel de app met een API-sleutel uit de bunq-app.',
+      howTo:
+        'Maak in de bunq-app een API-sleutel aan: in de instellingen, onder Developers → API keys.',
+      apiKey: 'API-sleutel',
+      warning:
+        'Een API-sleutel geeft volledige toegang tot je bunq-account. Deze app gebruikt hem alleen om saldi te lezen en bewaart hem versleuteld op dit toestel.',
+      submit: 'Koppelen',
+      processing: 'Verbinden met bunq… Een sleutel maken kan een halve minuut duren.',
+      connected: 'Gekoppeld met bunq',
+      errors: {
+        invalidKey: 'Vul de API-sleutel in, zonder spaties.',
+        refused: 'bunq heeft deze sleutel geweigerd. Controleer hem en probeer het opnieuw.',
+        unavailable: 'bunq is nu niet bereikbaar. Probeer het later opnieuw.',
+      },
+    },
+    accounts: {
+      title: 'Rekening',
+      hint: 'Kies de rekening waarmee je wilt rekenen.',
+      empty: 'Er zijn geen actieve rekeningen gevonden.',
+      loadFailed: 'De rekeningen konden niet worden opgehaald.',
+      disconnect: 'bunq ontkoppelen',
+      disconnectTitle: 'bunq ontkoppelen?',
+      disconnectMessage:
+        'De API-sleutel wordt van dit toestel verwijderd. Trek hem ook in de bunq-app in als je hem niet meer gebruikt.',
+      disconnecting: 'Ontkoppelen…',
+    },
   },
   debug: {
     open: 'Debug',
@@ -123,9 +170,54 @@ export const en: Translations = {
       failed: 'That did not work. Please try again.',
     },
   },
-  home: {
-    title: 'Home',
-    body: 'You are signed in. Build your first domain from here, see docs/conventions.md.',
+  budget: {
+    title: 'Per day',
+    perDay: 'To spend today',
+    daysLeft: '{{count}} days left this month, today included.',
+    lastDay: 'Today is the last day of the month.',
+    nothingLeft: 'There is nothing left on this account to divide.',
+    balance: 'Balance {{amount}} on {{account}}',
+    loadFailed: 'The balance could not be loaded.',
+    connect: {
+      title: 'Connect your bunq account',
+      body: 'The app reads the balance of one bunq account and works out how much you can spend per day until the end of the month.',
+      refused: 'bunq no longer accepts the connection. Connect again with a valid API key.',
+      action: 'Connect bunq',
+    },
+    choose: {
+      body: 'Choose the account to budget with.',
+      missing: 'The chosen account is gone. Choose another one.',
+      action: 'Choose another account',
+    },
+  },
+  bunq: {
+    connect: {
+      title: 'Connect bunq',
+      intro: 'Connect the app with an API key from the bunq app.',
+      howTo: 'Create an API key in the bunq app: in the settings, under Developers → API keys.',
+      apiKey: 'API key',
+      warning:
+        'An API key gives full access to your bunq account. This app only uses it to read balances and keeps it encrypted on this device.',
+      submit: 'Connect',
+      processing: 'Connecting to bunq… Creating a key can take half a minute.',
+      connected: 'Connected to bunq',
+      errors: {
+        invalidKey: 'Enter the API key, without spaces.',
+        refused: 'bunq refused this key. Check it and try again.',
+        unavailable: 'bunq cannot be reached right now. Please try again later.',
+      },
+    },
+    accounts: {
+      title: 'Account',
+      hint: 'Choose the account to budget with.',
+      empty: 'No active accounts were found.',
+      loadFailed: 'The accounts could not be loaded.',
+      disconnect: 'Disconnect bunq',
+      disconnectTitle: 'Disconnect bunq?',
+      disconnectMessage:
+        'The API key is removed from this device. Also revoke it in the bunq app if you no longer use it.',
+      disconnecting: 'Disconnecting…',
+    },
   },
   debug: {
     open: 'Debug',

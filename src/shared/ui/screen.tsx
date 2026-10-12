@@ -1,5 +1,12 @@
-import { useState, type ReactNode } from 'react';
-import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { useState, type ReactElement, type ReactNode } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  type RefreshControlProps,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenFooter } from './screen-footer';
 import { colors, spacing } from './theme';
@@ -9,6 +16,7 @@ import { colors, spacing } from './theme';
  * owns the bottom safe area; without one, the SafeAreaView keeps that inset.
  * Top inset is skipped: the stack header already covers the status bar.
  * Set `scroll={false}` when a child owns scrolling (e.g. sticky search + list).
+ * Pass a `refreshControl` for pull-to-refresh on the scrolling body.
  */
 export function Screen({
   children,
@@ -16,6 +24,7 @@ export function Screen({
   contentStyle,
   backgroundColor = colors.surface,
   scroll = true,
+  refreshControl,
 }: {
   children: ReactNode;
   footer?: ReactNode;
@@ -25,6 +34,7 @@ export function Screen({
   backgroundColor?: string;
   /** When false, the body fills the screen and does not scroll. */
   scroll?: boolean;
+  refreshControl?: ReactElement<RefreshControlProps>;
 }) {
   const [footerHeight, setFooterHeight] = useState(0);
   const bodyStyle = [
@@ -40,6 +50,7 @@ export function Screen({
           contentContainerStyle={bodyStyle}
           scrollIndicatorInsets={{ bottom: footer ? footerHeight : 0 }}
           keyboardShouldPersistTaps="handled"
+          refreshControl={refreshControl}
         >
           {children}
         </ScrollView>

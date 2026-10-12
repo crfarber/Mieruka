@@ -66,7 +66,7 @@ Zustand-stores worden met een fabriek gemaakt (`createSessionStore()`), niet als
 
 ## 6. Sessies en beveiliging
 
-- Alleen `TokenProvider` leest en schrijft tokens; de rest vraagt `getAccessToken()` of `refreshNow()`.
+- Alleen `TokenProvider` leest en schrijft tokens; de rest vraagt `getAccessToken()` of `refreshNow()`. De sleutels van bunq (een andere partij) hebben hun eigen eigenaar met dezelfde garanties: `BunqConnectionService`, zie [ADR 0018](decisions/0018-bunq-koppeling.md).
 - Een tijdelijke fout (geen netwerk, 5xx) houdt de sessie in stand; alleen een definitieve weigering (`invalid_grant`, 401/403 op de refresh) logt uit. Zie `refresh-policy.ts`.
 - De inlogmethode komt uit `EXPO_PUBLIC_AUTH_PROVIDER` (`demo` of `azure-ad`, zie [ADR 0017](decisions/0017-inlogmethode-per-build.md)). `demo` mag niet in productie.
 - Geheimen staan in de Keychain/Keystore via `SecretStore`; grote waarden worden verdeeld over stukken (`chunked-store.ts`).
