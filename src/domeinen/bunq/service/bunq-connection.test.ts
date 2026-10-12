@@ -166,7 +166,7 @@ describe('connecting', () => {
 
     const result = await connection.connect('wrong-key');
 
-    expect(result).toEqual({ ok: false, error: { kind: 'refused' } });
+    expect(result).toEqual({ ok: false, error: { kind: 'refused', reason: null } });
     expect(stored()).toBeUndefined();
     expect(connection.getStatus()).toBe('disconnected');
     expect(JSON.stringify(logger.entries())).not.toContain('wrong-key');
@@ -176,7 +176,49 @@ describe('connecting', () => {
     const { bunq, connection } = setup();
     bunq.once('POST /session-server', status(403));
 
-    expect(await connection.connect('key')).toEqual({ ok: false, error: { kind: 'refused' } });
+    expect(await connection.connect('key')).toEqual({
+      ok: false,
+      error: { kind: 'refused', reason: null },
+    });
+  });
+
+  it("passes on bunq's own reason for refusing the key, and logs it", async () => {
+    const { bunq, connection, logger } = setup();
+    bunq.once(
+      'POST /device-server',
+      () =>
+        new Response(
+          JSON.stringify({
+            Error: [
+              {
+                error_description:
+                  'User credentials are incorrect. Incorrect API key or IP address.',
+                error_description_translated: 'Onjuiste gegevens.',
+              },
+            ],
+          }),
+          { status: 400 },
+        ),
+    );
+
+    const result = await connection.connect('key');
+
+    const reason = 'User credentials are incorrect. Incorrect API key or IP address.';
+    expect(result).toEqual({ ok: false, error: { kind: 'refused', reason } });
+    expect(logger.entries().find((entry) => entry.category === 'bunq')?.data).toEqual({
+      status: 400,
+      reason,
+    });
+  });
+
+  it('logs a failure it cannot explain before passing it on', async () => {
+    const { connection, logger } = setup({
+      signer: { ...signer, generateKeyPair: () => Promise.reject(new Error('no BigInt')) },
+    });
+
+    await expect(connection.connect('key')).rejects.toThrow('no BigInt');
+
+    expect(logger.entries().some((entry) => entry.level === 'error')).toBe(true);
   });
 
   it('says bunq is unavailable when the network is down or bunq has trouble', async () => {

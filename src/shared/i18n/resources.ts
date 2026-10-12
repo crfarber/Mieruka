@@ -64,7 +64,7 @@ export const nl = {
       title: 'bunq koppelen',
       intro: 'Koppel de app met een API-sleutel uit de bunq-app.',
       howTo:
-        'Maak in de bunq-app een API-sleutel aan: in de instellingen, onder Developers → API keys.',
+        'Maak in de bunq-app een API-sleutel aan (instellingen, onder Developers → API keys) en zet bij die sleutel "Allow All IP Addresses" aan. Koppel binnen 4 uur: daarna wordt een ongebruikte sleutel ongeldig.',
       apiKey: 'API-sleutel',
       warning:
         'Een API-sleutel geeft volledige toegang tot je bunq-account. Deze app gebruikt hem alleen om saldi te lezen en bewaart hem versleuteld op dit toestel.',
@@ -73,7 +73,9 @@ export const nl = {
       connected: 'Gekoppeld met bunq',
       errors: {
         invalidKey: 'Vul de API-sleutel in, zonder spaties.',
-        refused: 'bunq heeft deze sleutel geweigerd. Controleer hem en probeer het opnieuw.',
+        refused:
+          'bunq heeft deze sleutel geweigerd. Staat "Allow All IP Addresses" aan bij de sleutel, en is hij minder dan 4 uur oud? Maak anders een nieuwe.',
+        bunqSays: 'bunq zegt: {{reason}}',
         unavailable: 'bunq is nu niet bereikbaar. Probeer het later opnieuw.',
       },
     },
@@ -194,7 +196,8 @@ export const en: Translations = {
     connect: {
       title: 'Connect bunq',
       intro: 'Connect the app with an API key from the bunq app.',
-      howTo: 'Create an API key in the bunq app: in the settings, under Developers → API keys.',
+      howTo:
+        'Create an API key in the bunq app (settings, under Developers → API keys) and turn on "Allow All IP Addresses" for it. Connect within 4 hours: after that an unused key stops working.',
       apiKey: 'API key',
       warning:
         'An API key gives full access to your bunq account. This app only uses it to read balances and keeps it encrypted on this device.',
@@ -203,7 +206,9 @@ export const en: Translations = {
       connected: 'Connected to bunq',
       errors: {
         invalidKey: 'Enter the API key, without spaces.',
-        refused: 'bunq refused this key. Check it and try again.',
+        refused:
+          'bunq refused this key. Is "Allow All IP Addresses" on for the key, and is it less than 4 hours old? Otherwise create a new one.',
+        bunqSays: 'bunq says: {{reason}}',
         unavailable: 'bunq cannot be reached right now. Please try again later.',
       },
     },

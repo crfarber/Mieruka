@@ -58,8 +58,11 @@ export function parseApiKey(input: string): Result<string, 'empty' | 'malformed'
 export type ConnectFailure =
   /** Nothing usable was typed. */
   | { kind: 'invalid-key' }
-  /** bunq answered, but would not register this device or start a session with the key. */
-  | { kind: 'refused' }
+  /**
+   * bunq answered, but would not register this device or start a session with the key. `reason`
+   * is bunq's own explanation, when it gave one.
+   */
+  | { kind: 'refused'; reason: string | null }
   /** bunq could not be reached, or had a temporary problem. Trying again later may work. */
   | { kind: 'unavailable' }
   /** The user disconnected (or signed out) while connecting. Nothing to explain. */

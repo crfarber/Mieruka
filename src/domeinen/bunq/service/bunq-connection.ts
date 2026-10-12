@@ -3,6 +3,7 @@ import type { HttpClient } from '@/shared/api/http-client';
 import type { Logger } from '@/shared/logging/logger';
 import { err, ok, type Result } from '@/shared/result';
 import {
+  bunqErrorDescription,
   createInstallation,
   registerDevice,
   startSession,
@@ -168,9 +169,11 @@ export function createBunqConnection(deps: BunqConnectionDeps): BunqConnectionSe
         return err({ kind: 'unavailable' });
       }
       if (stage === 'login' && error instanceof HttpError) {
-        logger?.warn('bunq', 'bunq refused the API key', { status: error.status });
-        return err({ kind: 'refused' });
+        const reason = bunqErrorDescription(error);
+        logger?.warn('bunq', 'bunq refused the API key', { status: error.status, reason });
+        return err({ kind: 'refused', reason });
       }
+      logger?.error('bunq', 'Connecting to bunq failed unexpectedly', { stage, error });
       throw error;
     }
 
@@ -198,6 +201,7 @@ export function createBunqConnection(deps: BunqConnectionDeps): BunqConnectionSe
       if (error instanceof HttpError && !isRetryable(error) && generation === startedIn) {
         logger?.warn('bunq', 'bunq refused a new session, the connection ends', {
           status: error.status,
+          reason: bunqErrorDescription(error),
         });
         await end('refused');
         throw new BunqNotConnectedError({ cause: error });

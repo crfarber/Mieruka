@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { ResponseParseError } from '@/shared/api/errors';
+import { HttpError, NetworkError, ResponseParseError } from '@/shared/api/errors';
 import { createHttpClient } from '@/shared/api/http-client';
 import { createLogger } from '@/shared/logging/logger';
 import { createFakeClock, jsonResponse } from '@/test/fakes';
 import {
+  bunqErrorDescription,
   CLIENT_NAME,
   createInstallation,
   listMonetaryAccounts,
@@ -146,6 +147,39 @@ describe('startSession', () => {
     await expect(startSession(http, { installationToken: 'i', apiKey: 'k', sign })).rejects.toThrow(
       'no UserPerson or UserCompany',
     );
+  });
+});
+
+describe('bunqErrorDescription', () => {
+  const refusal = (body: string) => new HttpError(400, null, body);
+
+  it("reads bunq's own explanation of a refusal", () => {
+    const body = JSON.stringify({
+      Error: [{ error_description: 'Incorrect API key or IP address.' }],
+    });
+
+    expect(bunqErrorDescription(refusal(body))).toBe('Incorrect API key or IP address.');
+  });
+
+  it('joins several explanations', () => {
+    const body = JSON.stringify({
+      Error: [{ error_description: 'One.' }, { error_description: 'Two.' }],
+    });
+
+    expect(bunqErrorDescription(refusal(body))).toBe('One. Two.');
+  });
+
+  it.each([
+    ['an empty body', ''],
+    ['a body that is not JSON', '<html>'],
+    ['an empty list of errors', '{"Error":[]}'],
+    ['another shape', '{"title":"Bad request"}'],
+  ])('has nothing to say for %s', (_case, body) => {
+    expect(bunqErrorDescription(refusal(body))).toBeNull();
+  });
+
+  it('has nothing to say when bunq did not answer at all', () => {
+    expect(bunqErrorDescription(new NetworkError())).toBeNull();
   });
 });
 

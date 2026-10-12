@@ -38,7 +38,7 @@ Zonder geldige configuratie stopt de app bij het opstarten met een duidelijke me
 
 Het startscherm toont hoeveel je per dag kunt uitgeven: het saldo van één bunq-rekening gedeeld door de dagen die nog over zijn in de maand (vandaag meegeteld).
 
-1. Maak in de bunq-app een API-sleutel aan (instellingen, Developers → API keys).
+1. Maak in de bunq-app een API-sleutel aan (instellingen, Developers → API keys) en zet bij die sleutel **Allow All IP Addresses** aan. Koppel binnen 4 uur; daarna wordt een ongebruikte sleutel ongeldig.
 2. Log in de app in, tik op **bunq koppelen** en plak de sleutel. Het maken van een sleutelpaar kan een halve minuut duren.
 3. Kies de rekening. De keuze en de koppeling blijven bewaard tot je ontkoppelt of uitlogt.
 

@@ -43,7 +43,14 @@ export function BunqConnectScreen() {
           return { tone: 'success', message: t('bunq.connect.connected') };
         }
         const key = describeConnectFailure(result.error);
-        setMessage(key === null ? null : t(key));
+        const reason = result.error.kind === 'refused' ? result.error.reason : null;
+        setMessage(
+          key === null
+            ? null
+            : [t(key), reason === null ? null : t('bunq.connect.errors.bunqSays', { reason })]
+                .filter((line) => line !== null)
+                .join('\n'),
+        );
         return { tone: 'none' };
       });
     } catch {

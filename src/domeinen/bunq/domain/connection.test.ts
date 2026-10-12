@@ -43,7 +43,9 @@ describe('parseApiKey', () => {
 describe('describeConnectFailure', () => {
   it('has a text for every failure the user can do something about', () => {
     expect(describeConnectFailure({ kind: 'invalid-key' })).toBe('bunq.connect.errors.invalidKey');
-    expect(describeConnectFailure({ kind: 'refused' })).toBe('bunq.connect.errors.refused');
+    expect(describeConnectFailure({ kind: 'refused', reason: null })).toBe(
+      'bunq.connect.errors.refused',
+    );
     expect(describeConnectFailure({ kind: 'unavailable' })).toBe('bunq.connect.errors.unavailable');
   });
 

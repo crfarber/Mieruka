@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ResponseParseError } from '@/shared/api/errors';
+import { HttpError, ResponseParseError } from '@/shared/api/errors';
 import type { HttpClient, RequestOptions } from '@/shared/api/http-client';
 import type { QueryValue } from '@/shared/api/url';
 import type { BunqEnvironment } from '@/shared/config/runtime-config';
@@ -81,6 +81,31 @@ function pick<T>(
     }
   }
   throw new ResponseParseError([`${path}: no ${keys.join(' or ')} in the response`]);
+}
+
+/** How bunq explains a 4xx (the field the bunq SDKs read: `Error[].error_description`). */
+const errorSchema = z.looseObject({
+  Error: z.array(z.looseObject({ error_description: z.string() })).min(1),
+});
+
+/**
+ * bunq's own explanation of a refusal, for example "Incorrect API key or IP address.". Null when
+ * the failure is not an answer from bunq or has no explanation in the expected shape.
+ */
+export function bunqErrorDescription(error: unknown): string | null {
+  if (!(error instanceof HttpError)) {
+    return null;
+  }
+  let body: unknown;
+  try {
+    body = JSON.parse(error.body);
+  } catch {
+    return null;
+  }
+  const parsed = errorSchema.safeParse(body);
+  return parsed.success
+    ? parsed.data.Error.map((entry) => entry.error_description).join(' ')
+    : null;
 }
 
 const tokenSchema = z.looseObject({ token: z.string().min(1) });
