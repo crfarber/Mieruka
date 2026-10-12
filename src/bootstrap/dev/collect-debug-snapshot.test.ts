@@ -7,6 +7,7 @@ import {
   createTokenProvider,
   SESSION_KEY,
 } from '@/domeinen/auth';
+import { ACCOUNT_CHOICE_KEY, CONNECTION_KEY } from '@/domeinen/bunq';
 import { LANGUAGE_KEY } from '@/domeinen/settings';
 import { createFakeClock, createInMemorySecretStore, createRecordingSleep } from '@/test/fakes';
 import { collectDebugSnapshot } from './collect-debug-snapshot';
@@ -38,6 +39,7 @@ describe('collectDebugSnapshot', () => {
 
     expect(snapshot.storage[SESSION_KEY]).toBeNull();
     expect(snapshot.storage[LANGUAGE_KEY]).toBeNull();
+    expect(snapshot.storage[ACCOUNT_CHOICE_KEY]).toBeNull();
     expect(snapshot.sessionStore).toEqual({
       status: 'signed-out',
       method: null,
@@ -61,6 +63,8 @@ describe('collectDebugSnapshot', () => {
       expiresAt: Date.UTC(2026, 8, 21, 13, 0, 0),
     });
     await store.setItem(LANGUAGE_KEY, 'en');
+    await store.setItem(ACCOUNT_CHOICE_KEY, '11');
+    await store.setItem(CONNECTION_KEY, '{"apiKey":"bunq-api-key"}');
 
     const sessionStore = createSessionStore();
     const provider = createTokenProvider({
@@ -91,6 +95,8 @@ describe('collectDebugSnapshot', () => {
       expiresAt: Date.UTC(2026, 8, 21, 13, 0, 0),
     });
     expect(snapshot.storage[LANGUAGE_KEY]).toBe('en');
+    expect(snapshot.storage[ACCOUNT_CHOICE_KEY]).toBe(11);
+    expect(JSON.stringify(snapshot)).not.toContain('bunq-api-key');
     expect(snapshot.sessionStore.status).toBe('signed-in');
     expect(snapshot.tokenProvider).toMatchObject({
       status: 'signed-in',

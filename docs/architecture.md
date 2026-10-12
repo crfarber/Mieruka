@@ -24,7 +24,8 @@ Een pijl betekent "mag importeren". Naar rechts is lager. Tussen domeinen kan al
 | `auth`     | sessie, refresh-beleid, `TokenProvider`, `SessionLifecycle`, `Authenticator`-poort met demo- en Azure AD-implementatie, sessiestore, loginscherm | [0008](decisions/0008-sessies-en-tokens.md), [0012](decisions/0012-azure-ad-inloggen.md), [0017](decisions/0017-inlogmethode-per-build.md) |
 | `settings` | instellingenscherm, taalkeuze (NL/EN, bewaard), uitloggen                                                                                        | [0013](decisions/0013-instellingen-en-taal.md)                                                                                             |
 | `support`  | log van de laatste dag, al geredigeerd, delen via het systeem                                                                                    | [0014](decisions/0014-supportlog-en-querycache.md)                                                                                         |
-| `home`     | het startscherm na inloggen; vervang het door het eerste echte domein                                                                            |                                                                                                                                            |
+| `bunq`     | koppeling met bunq via een API-sleutel (installatie, toestel, sessie, RSA-handtekening), rekeningen ophalen, één rekening kiezen, ontkoppelen    | [0018](decisions/0018-bunq-koppeling.md)                                                                                                   |
+| `budget`   | het startscherm: saldo van de gekozen rekening gedeeld door de dagen die nog over zijn in de maand                                               | [0018](decisions/0018-bunq-koppeling.md)                                                                                                   |
 
 Daarnaast `src/bootstrap/dev/`: een debugscherm (alleen in `__DEV__`) met opslag, sessie en querycache, en het access token kopiëren.
 
@@ -64,7 +65,7 @@ hook (useQuery) ─► api.list() ─► HttpClient.requestJson
 
 ## Uitloggen en gebruikersdata
 
-`clearUserData` in de container wist bij uitloggen (en bij een verlopen sessie) de Query-cache in het geheugen en op schijf. Voorkeuren zoals de taalkeuze blijven staan. Een domein dat gebruikersdata bewaart (concepten, een wachtrij, foto's), voegt hier zijn opruimactie toe, met een scenario in `container.test.ts`.
+`clearUserData` in de container wist bij uitloggen (en bij een verlopen sessie) de Query-cache in het geheugen en op schijf, de bunq-koppeling en de gekozen rekening. Voorkeuren zoals de taalkeuze blijven staan. Een domein dat gebruikersdata bewaart (concepten, een wachtrij, foto's), voegt hier zijn opruimactie toe, met een scenario in `container.test.ts`.
 
 ## Fouten
 

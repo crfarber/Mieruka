@@ -6,6 +6,7 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type LogCategory =
   | 'app'
   | 'auth'
+  | 'bunq'
   | 'http'
   | 'sync'
   | 'notifications'

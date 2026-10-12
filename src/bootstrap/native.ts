@@ -1,6 +1,8 @@
 import { authorize, refresh } from 'react-native-app-auth';
+import { getRandomBytes } from 'expo-crypto';
 import { fetch as expoFetch } from 'expo/fetch';
 import type { Authenticator } from '@/domeinen/auth';
+import { createRsaSigner } from '@/domeinen/bunq';
 import { createAzureAdAuthenticator } from '@/domeinen/auth/ui';
 import { createRnLogShare } from '@/domeinen/support/ui';
 import { createDeviceKeyValueStore } from '@/shared/platform/rn/key-value-store';
@@ -41,6 +43,7 @@ export function createNativeContainer(): Container {
     language: detectLanguage(),
     deviceAuthenticator: buildDeviceAuthenticator(config),
     logShare: createRnLogShare(),
+    bunqSigner: createRsaSigner(getRandomBytes),
     haptics: createExpoHaptics(),
     logSink: consoleSink,
     fetch: expoFetch,

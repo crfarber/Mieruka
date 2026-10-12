@@ -41,6 +41,15 @@ describe('redact', () => {
     });
   });
 
+  it('hides api keys and private keys', () => {
+    expect(redact({ apiKey: 'key', api_key: 'key', privateKey: 'pem', keyCount: 3 })).toEqual({
+      apiKey: '[redacted]',
+      api_key: '[redacted]',
+      privateKey: '[redacted]',
+      keyCount: 3,
+    });
+  });
+
   it('masks personal data by key name', () => {
     expect(redact({ phoneNumber: '+31612345678', email: 'jan@example.test' })).toEqual({
       phoneNumber: '***678',

@@ -20,8 +20,18 @@ describe('parseRuntimeConfig', () => {
         apiBaseUrl: null,
         environment: 'internal',
         auth: { provider: 'demo' },
+        bunqEnvironment: 'production',
       },
     });
+  });
+
+  it('talks to the bunq sandbox only when asked to', () => {
+    const sandbox = parseRuntimeConfig({ EXPO_PUBLIC_BUNQ_ENVIRONMENT: 'sandbox' });
+    const empty = parseRuntimeConfig({ EXPO_PUBLIC_BUNQ_ENVIRONMENT: '' });
+
+    expect(sandbox.ok && sandbox.value.bunqEnvironment).toBe('sandbox');
+    expect(empty.ok && empty.value.bunqEnvironment).toBe('production');
+    expect(parseRuntimeConfig({ EXPO_PUBLIC_BUNQ_ENVIRONMENT: 'test' }).ok).toBe(false);
   });
 
   it('strips trailing slashes from the base url', () => {

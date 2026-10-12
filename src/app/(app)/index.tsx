@@ -1,3 +1,3 @@
-import { HomeScreen } from '@/domeinen/home/ui';
+import { DailyBudgetScreen } from '@/domeinen/budget/ui';
 
-export default HomeScreen;
+export default DailyBudgetScreen;

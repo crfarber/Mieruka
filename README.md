@@ -34,16 +34,27 @@ Zonder geldige configuratie stopt de app bij het opstarten met een duidelijke me
 7. **Eerste domein:** vervang `home` door je eerste echte domein, zie [docs/conventions.md](docs/conventions.md#een-nieuw-domein-toevoegen).
 8. Verwijder dit hoofdstuk uit de README en beschrijf het project.
 
+## bunq koppelen
+
+Het startscherm toont hoeveel je per dag kunt uitgeven: het saldo van één bunq-rekening gedeeld door de dagen die nog over zijn in de maand (vandaag meegeteld).
+
+1. Maak in de bunq-app een API-sleutel aan (instellingen, Developers → API keys) en zet bij die sleutel **Allow All IP Addresses** aan. Koppel binnen 4 uur; daarna wordt een ongebruikte sleutel ongeldig.
+2. Log in de app in, tik op **bunq koppelen** en plak de sleutel. Het maken van een sleutelpaar kan een halve minuut duren.
+3. Kies de rekening. De keuze en de koppeling blijven bewaard tot je ontkoppelt of uitlogt.
+
+Testen zonder echt geld: zet `EXPO_PUBLIC_BUNQ_ENVIRONMENT=sandbox` en maak een testgebruiker met `curl -X POST https://public-api.sandbox.bunq.com/v1/sandbox-user-person`. Het antwoord bevat een API-sleutel. Zie [ADR 0018](docs/decisions/0018-bunq-koppeling.md) voor de keuzes en [open-vragen.md](docs/functioneel/open-vragen.md) voor wat nog niet zeker is.
+
 ## Configuratie
 
-| Variabele                    | Betekenis                                                     |
-| ---------------------------- | ------------------------------------------------------------- |
-| `APP_VARIANT`                | `internal` / `acceptance` / `production`, gezet in `eas.json` |
-| `EXPO_PUBLIC_API_BASE_URL`   | basis-URL van de API (optioneel; leeg = geen backend)         |
-| `EXPO_PUBLIC_ENVIRONMENT`    | `internal` / `acceptance` / `production`                      |
-| `EXPO_PUBLIC_AUTH_PROVIDER`  | `demo` (standaard) of `azure-ad`                              |
-| `EXPO_PUBLIC_AZURE_AD_*`     | tenant, client, redirect-URL en API-scopes bij `azure-ad`     |
-| `EXPO_PUBLIC_EAS_PROJECT_ID` | EAS-project, alleen voor EAS Build/Update                     |
+| Variabele                      | Betekenis                                                     |
+| ------------------------------ | ------------------------------------------------------------- |
+| `APP_VARIANT`                  | `internal` / `acceptance` / `production`, gezet in `eas.json` |
+| `EXPO_PUBLIC_API_BASE_URL`     | basis-URL van de API (optioneel; leeg = geen backend)         |
+| `EXPO_PUBLIC_ENVIRONMENT`      | `internal` / `acceptance` / `production`                      |
+| `EXPO_PUBLIC_AUTH_PROVIDER`    | `demo` (standaard) of `azure-ad`                              |
+| `EXPO_PUBLIC_AZURE_AD_*`       | tenant, client, redirect-URL en API-scopes bij `azure-ad`     |
+| `EXPO_PUBLIC_EAS_PROJECT_ID`   | EAS-project, alleen voor EAS Build/Update                     |
+| `EXPO_PUBLIC_BUNQ_ENVIRONMENT` | `production` (standaard) of `sandbox` (bunq-testomgeving)     |
 
 Zie [.env.example](.env.example). `EXPO_PUBLIC_*` wordt in de app gebakken en is niet geheim.
 
@@ -67,7 +78,7 @@ Een wijziging is **klaar** als `pnpm run ci` slaagt en de app bundelt (`pnpm exe
 src/
   app/            Expo Router: dunne routes, alleen koppelen (geen logica)
   bootstrap/      composition root: bouwt alle onderdelen en koppelt ze (container.ts)
-  domeinen/       één map per domein: auth, settings, support, home
+  domeinen/       één map per domein: auth, settings, support, bunq, budget
   shared/         herbruikbare basis: HTTP-client, logger, config, i18n, poorten, feedback, UI-primitieven
   test/           fakes voor tests (klok, opslag, scheduler, HTTP-antwoorden)
 docs/             conventies, architectuur, beslissingen (ADR's)

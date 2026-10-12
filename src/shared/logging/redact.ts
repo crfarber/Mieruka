@@ -4,7 +4,8 @@
  * belong in a log that is shared with support.
  */
 
-const SECRET_KEY = /(token|authorization|password|secret|jwt|cookie|smscode|verificationcode|otp)/i;
+const SECRET_KEY =
+  /(token|authorization|password|secret|jwt|cookie|smscode|verificationcode|otp|api_?key|private_?key)/i;
 const PERSONAL_KEY = /(phone|email|username|iban)/i;
 
 const MAX_STRING_LENGTH = 500;
