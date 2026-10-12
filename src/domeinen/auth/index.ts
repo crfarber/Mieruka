@@ -1,0 +1,13 @@
+export { describeLoginFailure } from './domain/login-failures';
+export type { LoginFailure, LoginMessageKey } from './domain/login-failures';
+export type { AuthMethod, Session } from './domain/session';
+export { createAuthService, createRefresher } from './service/auth-service';
+export type { AuthService, Authenticator } from './service/auth-service';
+export { createDemoAuthenticator, DEMO_TOKEN_LIFETIME_MS } from './service/demo-authenticator';
+export { createSessionLifecycle } from './service/session-lifecycle';
+export type { Scheduler, SessionLifecycle } from './service/session-lifecycle';
+export { createSessionRepository, SESSION_KEY } from './service/session-repository';
+export { createTokenProvider } from './service/token-provider';
+export type { SessionEvent, SessionStatus, TokenProvider } from './service/token-provider';
+export { bindSessionStore, createSessionStore } from './store/session-store';
+export type { SessionState, SessionStore } from './store/session-store';

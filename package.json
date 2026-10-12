@@ -1,0 +1,73 @@
+{
+  "name": "expo-boilerplate",
+  "productName": "Expo Boilerplate",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "prebuild": "expo prebuild --clean",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck",
+    "ci": "pnpm run check && pnpm run test:coverage",
+    "doctor": "pnpm dlx expo-doctor",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^15.1.1",
+    "@tanstack/react-query": "^5.103.2",
+    "expo": "~57.0.24",
+    "expo-build-properties": "~57.0.21",
+    "expo-clipboard": "~57.0.2",
+    "expo-constants": "~57.0.19",
+    "expo-haptics": "~57.0.3",
+    "expo-linking": "~57.0.10",
+    "expo-router": "~57.0.22",
+    "expo-secure-store": "~57.0.4",
+    "expo-splash-screen": "~57.0.9",
+    "expo-sqlite": "~57.0.3",
+    "expo-status-bar": "~57.0.1",
+    "expo-system-ui": "~57.0.4",
+    "i18next": "^26.4.2",
+    "react": "19.2.3",
+    "react-i18next": "^17.0.15",
+    "react-native": "0.86.3",
+    "react-native-app-auth": "8.4.1",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "zod": "^4.6.5",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@types/react": "~19.2.2",
+    "@vitest/coverage-v8": "^4.1.10",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
+    "oxlint": "^1.85.0",
+    "prettier": "^3.9.8",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,mts,cjs}": [
+      "prettier --write",
+      "oxlint --fix"
+    ],
+    "*.{json,md,yml,yaml}": "prettier --write"
+  }
+}
